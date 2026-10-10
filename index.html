@@ -1,253 +1,165 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulador de Juros Compostos com Gráfico</title>
-<!-- Script estável do Chart.js para renderizar o gráfico -->
-<script src="https://cloudflare.com"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simulador de juros compostos | @umbomdinheiro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&display=swap" rel="stylesheet">
 <style>
-body {
-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-background-color: #f4f7f6;
-display: flex;
-justify-content: center;
-align-items: center;
-min-height: 100vh;
-margin: 0;
-padding: 20px;
-box-sizing: border-box;
-}
-.container {
-background-color: #ffffff;
-padding: 30px;
-border-radius: 12px;
-box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-max-width: 800px;
-width: 100%;
-}
-h2 {
-text-align: center;
-color: #333;
-margin-bottom: 24px;
-}
-.content-wrapper {
-display: grid;
-grid-template-columns: 1fr;
-gap: 30px;
-}
-@media (min-width: 768px) {
-.content-wrapper {
-grid-template-columns: 1fr 1fr;
-}
-}
-.form-group {
-margin-bottom: 15px;
-}
-label {
-display: block;
-margin-bottom: 5px;
-color: #666;
-font-weight: 600;
-}
-input {
-width: 100%;
-padding: 10px;
-border: 1px solid #ccc;
-border-radius: 6px;
-box-sizing: border-box;
-font-size: 16px;
-}
-button {
-width: 100%;
-padding: 12px;
-background-color: #2ecc71;
-border: none;
-color: white;
-font-size: 16px;
-font-weight: bold;
-border-radius: 6px;
-cursor: pointer;
-margin-top: 10px;
-transition: background 0.3s;
-}
-button:hover {
-background-color: #27ae60;
-}
-.result {
-margin-top: 25px;
-padding: 15px;
-background-color: #e8f8f5;
-border-radius: 6px;
-display: none;
-}
-.result p {
-margin: 8px 0;
-color: #2c3e50;
-font-size: 16px;
-}
-.result span {
-font-weight: bold;
-color: #27ae60;
-}
-.chart-container {
-position: relative;
-height: 320px;
-width: 100%;
-display: none;
-}
+:root{--bg:#EFDCB8;--ink:#0f0e17;--accent:#9f0500;--on-accent:#EFDCB8;--card:#f5e8cb;--line:rgba(159,0,5,.4);--muted:#0f0e17;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:700 16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:720px;margin:0 auto;padding:28px 18px 40px}
+h1{color:var(--accent);font-family:"Fraunces",Georgia,serif;font-weight:700;font-size:clamp(28px,7vw,40px);line-height:1.1;margin:0 0 10px}
+.lead{margin:0 0 26px;color:var(--muted);max-width:56ch}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:520px){.grid{grid-template-columns:1fr}}
+label{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
+.field{display:flex;align-items:stretch;border:2px solid var(--accent);border-radius:10px;background:var(--card);overflow:hidden}
+.field:focus-within{border-color:var(--accent);outline:2px solid var(--accent);outline-offset:1px}
+.field span{display:flex;align-items:center;padding:0 12px;color:var(--muted);font-size:14px;white-space:nowrap}
+.field input,.field select{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font:inherit;font-size:18px;padding:12px 4px;outline:none}
+.field select{padding-right:8px;font-size:16px}
+.hint{font-size:13px;color:var(--muted);margin:5px 0 0}
+.result{margin-top:28px;background:var(--accent);color:var(--on-accent);border-radius:16px;padding:24px 20px}
+.result p{margin:0}
+.big{font-family:"Fraunces",Georgia,serif;font-weight:700;font-size:clamp(34px,10vw,54px);line-height:1.05;margin:4px 0 18px!important;word-break:break-word}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;border-top:1px solid rgba(239,220,184,.35);padding-top:16px}
+@media (max-width:520px){.stats{grid-template-columns:1fr}}
+.stats b{display:block;font-size:19px}
+.stats small{opacity:.85}
+h2{color:var(--accent);font-family:"Fraunces",Georgia,serif;font-size:22px;margin:34px 0 12px}
+.chart{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:12px}
+.chart svg{display:block;width:100%;height:auto}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;margin-top:10px;color:var(--muted)}
+.legend i{display:inline-block;width:14px;height:4px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.scroll{overflow-x:auto;border:1.5px solid var(--line);border-radius:12px;background:var(--card)}
+table{border-collapse:collapse;width:100%;min-width:460px;font-size:15px}
+th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+th{font-weight:700;color:var(--accent)}
+tr:last-child td{border-bottom:0}
+.note{font-size:13px;color:var(--muted);margin-top:26px}
+footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);font-size:14px}
+footer a{color:var(--accent);font-weight:600}
+.err{color:var(--accent);font-weight:600;margin-top:14px;min-height:1.4em}
 </style>
 </head>
 <body>
-<div class="container">
-<h2>Simulador de Investimentos</h2>
+<main>
+<h1>Simulador de juros compostos</h1>
+<p class="lead">Veja quanto um valor inicial e aportes mensais viram com o tempo. Preencha os quatro campos e o resultado aparece na hora.</p>
 
-<div class="content-wrapper">
-<!-- Formulário com todos os campos e o R):</label>
-<input type="number" id="inicial" placeholder="Ex: 1000" step="0.01">
+<div class="grid">
+  <div><label for="ini">Aporte inicial</label>
+    <div class="field"><span>R$</span><input id="ini" inputmode="decimal" value="1.000" autocomplete="off"></div></div>
+  <div><label for="mes">Aporte mensal</label>
+    <div class="field"><span>R$</span><input id="mes" inputmode="decimal" value="300" autocomplete="off"></div></div>
+  <div><label for="tx">Juros médios por mês</label>
+    <div class="field"><input id="tx" inputmode="decimal" value="0,8" autocomplete="off"><span>% ao mês</span></div>
+    <p class="hint" id="anual"></p></div>
+  <div><label for="pz">Prazo</label>
+    <div class="field"><input id="pz" inputmode="numeric" value="10" autocomplete="off">
+    <select id="un" aria-label="Unidade do prazo"><option value="anos">anos</option><option value="meses">meses</option></select></div></div>
 </div>
-<div class="form-group">
-<label for="mensal">Aporte Mensal (R$`):</label>
-<input type="number" id="mensal" placeholder="Ex: 200" step="0.01">
-</div>
-<div class="form-group">
-<label for="taxa">Taxa de Juros Mensal (%):</label>
-<input type="number" id="taxa" placeholder="Ex: 1" step="0.01">
-</div>
-<div class="form-group">
-<label for="prazo">Prazo (em meses):</label>
-<input type="number" id="prazo" placeholder="Ex: 12">
-</div>
-<button onclick="calcularJurosCompostos()">Calcular</button>
+<p class="err" id="err" role="alert"></p>
 
-<!-- Resultados que aparecem ao clicar -->
-<div class="result" id="resultadoBox">
-<p>Total Investido: <span id="totalInvestido">R$ 0,00&lt;/span&gt;&lt;/p&gt; &lt;p&gt;Total em Juros: &lt;span id="totalJuros"&gt;R$ 0,00</span></p>
-<p>Montante Final: <span id="montanteFinal">R`$ 0,00</span></p>
-</div>
+<section class="result" aria-live="polite">
+  <p>Você terá</p>
+  <p class="big" id="total">R$ 0,00</p>
+  <div class="stats">
+    <p><small>Total que você colocou</small><b id="inv">R$ 0,00</b></p>
+    <p><small>Juros acumulados</small><b id="jur">R$ 0,00</b></p>
+    <p><small>Dos juros no total</small><b id="pct">0%</b></p>
+  </div>
+</section>
+
+<h2>Como o valor cresce</h2>
+<div class="chart">
+  <svg id="svg" viewBox="0 0 600 260" role="img" aria-label="Gráfico da evolução do valor acumulado e do total investido"></svg>
+  <div class="legend"><span><i style="background:var(--accent)"></i>Valor acumulado</span><span><i style="background:var(--ink)"></i>Total que você colocou</span></div>
 </div>
 
-<!-- Espaço reservado para o Gráfico -->
-<div class="chart-container" id="chartBox">
-<canvas id="evolucaoGrafico"></canvas>
-</div>
-</div>
-</div>
+<h2>Ano a ano</h2>
+<div class="scroll"><table>
+<thead><tr><th>Período</th><th>Colocado</th><th>Juros</th><th>Total</th></tr></thead>
+<tbody id="tb"></tbody></table></div>
+
+<p class="note">Simulação com taxa fixa e aportes feitos no fim de cada mês. O rendimento real varia e não está garantido. Não considera imposto de renda, inflação nem taxas. Material educativo, não é recomendação de investimento.</p>
+
+<footer>Feito por <a href="https://www.instagram.com/umbomdinheiro" target="_blank" rel="noopener">@umbomdinheiro</a>, educação financeira no Instagram.</footer>
+</main>
 
 <script>
-let meuGrafico = null;
-
-function calcularJurosCompostos() {
-const pInicial = parseFloat(document.getElementById('inicial').value) || 0;
-const pMensal = parseFloat(document.getElementById('mensal').value) || 0;
-const taxaMensal = (parseFloat(document.getElementById('taxa').value) || 0) / 100;
-const meses = parseInt(document.getElementById('prazo').value) || 0;
-
-if (meses <= 0 || taxaMensal < 0) {
-alert("Por favor, insira um prazo e uma taxa válidos.");
-return;
+(function(){
+var $=function(id){return document.getElementById(id)};
+var brl=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
+var num=new Intl.NumberFormat('pt-BR',{maximumFractionDigits:2});
+function parse(s){
+  s=String(s).trim().replace(/[^\d.,-]/g,'');
+  if(s.indexOf(',')>-1){s=s.replace(/\./g,'').replace(',','.')}
+  else if((s.match(/\./g)||[]).length>1){s=s.replace(/\./g,'')}
+  var n=parseFloat(s);return isNaN(n)?0:n;
 }
-
-const labelsMeses = [];
-const dadosInvestido = [];
-const dadosJuros = [];
-
-labelsMeses.push("Início");
-dadosInvestido.push(pInicial);
-dadosJuros.push(0);
-
-for (let i = 1; i <= meses; i++) {
-const valorMontanteInicial = pInicial * Math.pow((1 + taxaMensal), i);
-
-let valorAportesMensais = 0;
-if (taxaMensal === 0) {
-valorAportesMensais = pMensal * i;
-} else {
-valorAportesMensais = pMensal * ((Math.pow((1 + taxaMensal), i) - 1) / taxaMensal);
+function compact(v){
+  if(v>=1e6)return 'R$ '+num.format(v/1e6)+' mi';
+  if(v>=1e3)return 'R$ '+num.format(v/1e3)+' mil';
+  return 'R$ '+num.format(v);
 }
-
-const totalAcumulado = valorMontanteInicial + valorAportesMensais;
-const totalInvestidoMes = pInicial + (pMensal * i);
-const jurosGanhosMes = Math.max(0, totalAcumulado - totalInvestidoMes);
-
-labelsMeses.push("Mês " + i);
-dadosInvestido.push(totalInvestidoMes);
-dadosJuros.push(jurosGanhosMes);
+function run(){
+  var ini=parse($('ini').value),mes=parse($('mes').value),tx=parse($('tx').value)/100,
+      p=parseFloat(String($('pz').value).replace(',','.'))||0,un=$('un').value,
+      n=Math.round(un==='anos'?p*12:p),err=$('err');
+  if(ini<0||mes<0||tx<0){err.textContent='Use apenas valores positivos.';return}
+  if(n<1){err.textContent='Informe um prazo de pelo menos 1 mês.';return}
+  if(n>720){err.textContent='O prazo máximo é de 60 anos (720 meses).';return}
+  if(tx>0.5){err.textContent='Confira a taxa: ela é por mês, em porcentagem (exemplo: 0,8).';return}
+  err.textContent='';
+  $('anual').textContent='Equivale a cerca de '+num.format((Math.pow(1+tx,12)-1)*100)+'% ao ano.';
+  var bal=ini,inv=ini,tot=[bal],ivs=[inv],rows=[];
+  for(var m=1;m<=n;m++){
+    bal=bal*(1+tx)+mes;inv+=mes;tot.push(bal);ivs.push(inv);
+  }
+  var step=n/12>30?60:12;
+  for(var k=step;k<n;k+=step)rows.push(k);
+  rows.push(n);
+  $('total').textContent=brl.format(bal);
+  $('inv').textContent=brl.format(inv);
+  $('jur').textContent=brl.format(bal-inv);
+  $('pct').textContent=bal>0?num.format((bal-inv)/bal*100)+'%':'0%';
+  $('tb').innerHTML=rows.map(function(k){
+    var lab=k%12===0?(k/12)+(k/12===1?' ano':' anos'):k+' meses';
+    return '<tr><td>'+lab+'</td><td>'+brl.format(ivs[k])+'</td><td>'+brl.format(tot[k]-ivs[k])+'</td><td><b>'+brl.format(tot[k])+'</b></td></tr>';
+  }).join('');
+  draw(tot,ivs,n,un,p);
 }
-
-const totalFinalInvestido = dadosInvestido[dadosInvestido.length - 1];
-const totalFinalJuros = dadosJuros[dadosJuros.length - 1];
-const montanteFinal = totalFinalInvestido + totalFinalJuros;
-
-document.getElementById('totalInvestido').innerText = totalFinalInvestido.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-document.getElementById('totalJuros').innerText = totalFinalJuros.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-document.getElementById('montanteFinal').innerText = montanteFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
-document.getElementById('resultadoBox').style.display = 'block';
-document.getElementById('chartBox').style.display = 'block';
-
-renderizarGrafico(labelsMeses, dadosInvestido, dadosJuros);
+function draw(tot,ivs,n,un,p){
+  var W=600,H=260,L=64,R=14,T=14,B=34,pw=W-L-R,ph=H-T-B,max=tot[n]||1;
+  function X(i){return L+pw*i/n}
+  function Y(v){return T+ph-ph*v/max}
+  function path(a){var d='';for(var i=0;i<=n;i+=Math.max(1,Math.floor(n/240))){d+=(d?'L':'M')+X(i).toFixed(1)+' '+Y(a[i]).toFixed(1)}
+    d+='L'+X(n).toFixed(1)+' '+Y(a[n]).toFixed(1);return d}
+  var s='';
+  for(var g=0;g<=4;g++){
+    var v=max*g/4,y=Y(v);
+    s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y+'" y2="'+y+'" stroke="var(--line)"/>';
+    s+='<text x="'+(L-8)+'" y="'+(y+4)+'" text-anchor="end" font-size="12" fill="var(--muted)">'+compact(v)+'</text>';
+  }
+  var area=path(tot)+'L'+X(n)+' '+Y(0)+'L'+X(0)+' '+Y(0)+'Z';
+  s+='<path d="'+area+'" fill="var(--accent)" opacity=".18"/>';
+  s+='<path d="'+path(tot)+'" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linejoin="round"/>';
+  s+='<path d="'+path(ivs)+'" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-dasharray="6 5"/>';
+  s+='<text x="'+L+'" y="'+(H-10)+'" font-size="12" fill="var(--muted)">hoje</text>';
+  s+='<text x="'+(W-R)+'" y="'+(H-10)+'" text-anchor="end" font-size="12" fill="var(--muted)">'+(n%12===0?(n/12)+(n/12===1?' ano':' anos'):n+' meses')+'</text>';
+  $('svg').innerHTML=s;
 }
-
-function renderizarGrafico(labels, investido, juros) {
-const ctx = document.getElementById('evolucaoGrafico').getContext('2d');
-
-if (meuGrafico) {
-meuGrafico.destroy();
-}
-
-meuGrafico = new Chart(ctx, {
-type: 'bar',
-data: {
-labels: labels,
-datasets: [
-{
-label: 'Total Investido',
-data: investido,
-backgroundColor: '#3498db',
-borderColor: '#2980b9',
-borderWidth: 1
-},
-{
-label: 'Juros Acumulados',
-data: juros,
-backgroundColor: '#2ecc71',
-borderColor: '#27ae60',
-borderWidth: 1
-}
- ]
-},
-options: {
-responsive: true,
-maintainAspectRatio: false,
-scales: {
-x: { stacked: true },
-y: {
-stacked: true,
-ticks: {
-callback: function(value) {
-return 'R$ ' + value.toLocaleString('pt-BR');
-}
-}
-}
-},
-plugins: {
-tooltip: {
-callbacks: {
-label: function(context) {
-let label = context.dataset.label || '';
-if (label) label += ': ';
-if (context.parsed.y !== null) {
-label += new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(context.parsed.y);
-}
-return label;
-}
-}
-}
-}
-}
-});
-}
+['ini','mes','tx','pz','un'].forEach(function(id){$(id).addEventListener('input',run)});
+run();
+})();
 </script>
 </body>
 </html>
