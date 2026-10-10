@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Simulador de Juros Compostos com Gráfico</title>
-<!-- Script de alta estabilidade do Chart.js via CDN cdnjs -->
+<!-- Script estável do Chart.js para renderizar o gráfico -->
 <script src="https://cloudflare.com"></script>
 <style>
 body {
@@ -103,10 +103,11 @@ display: none;
 <h2>Simulador de Investimentos</h2>
 
 <div class="content-wrapper">
-<!-- Campos do Formulário -->
-<div>
+<!-- Formulário com todos os campos e o R):</label>
+<input type="number" id="inicial" placeholder="Ex: 1000" step="0.01">
+</div>
 <div class="form-group">
-<label for="inicial">Montante Inicial (R):</label>
+<label for="mensal">Aporte Mensal (R$`):</label>
 <input type="number" id="mensal" placeholder="Ex: 200" step="0.01">
 </div>
 <div class="form-group">
@@ -119,13 +120,14 @@ display: none;
 </div>
 <button onclick="calcularJurosCompostos()">Calcular</button>
 
+<!-- Resultados que aparecem ao clicar -->
 <div class="result" id="resultadoBox">
-<p>Total Investido: <span id="totalInvestido">R 0,00</span></p>
-<p>Montante Final: <span id="montanteFinal">R$` 0,00</span></p>
+<p>Total Investido: <span id="totalInvestido">R$ 0,00&lt;/span&gt;&lt;/p&gt; &lt;p&gt;Total em Juros: &lt;span id="totalJuros"&gt;R$ 0,00</span></p>
+<p>Montante Final: <span id="montanteFinal">R`$ 0,00</span></p>
 </div>
 </div>
 
-<!-- Canvas do Gráfico -->
+<!-- Espaço reservado para o Gráfico -->
 <div class="chart-container" id="chartBox">
 <canvas id="evolucaoGrafico"></canvas>
 </div>
@@ -224,7 +226,7 @@ y: {
 stacked: true,
 ticks: {
 callback: function(value) {
-return 'R`$ ' + value.toLocaleString('pt-BR');
+return 'R$ ' + value.toLocaleString('pt-BR');
 }
 }
 }
