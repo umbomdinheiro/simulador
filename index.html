@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Simulador de Juros Compostos com Gráfico</title>
-<!-- Importação do Chart.js via CDN estável -->
-<script src="https://jsdelivr.net"></script>
+<!-- Link oficial e corrigido do Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 body {
 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -103,7 +103,6 @@ display: none;
 <h2>Simulador de Investimentos</h2>
 
 <div class="content-wrapper">
-<!-- Formulário -->
 <div>
 <div class="form-group">
 <label for="inicial">Montante Inicial (R$):&lt;/label&gt; &lt;input type="number" id="inicial" placeholder="Ex: 1000" step="0.01"&gt; &lt;/div&gt; &lt;div class="form-group"&gt; &lt;label for="mensal"&gt;Aporte Mensal (R\$):</label>
@@ -119,14 +118,12 @@ display: none;
 </div>
 <button onclick="calcularJurosCompostos()">Calcular</button>
 
-<!-- Resultado -->
 <div class="result" id="resultadoBox">
 <p>Total Investido: <span id="totalInvestido">R$0,00&lt;/span&gt;&lt;/p&gt; &lt;p&gt;Total em Juros: &lt;span id="totalJuros"&gt;R\$ 0,00</span></p>
 <p>Montante Final: <span id="montanteFinal">R$` 0,00</span></p>
 </div>
 </div>
 
-<!-- Gráfico -->
 <div class="chart-container" id="chartBox">
 <canvas id="evolucaoGrafico"></canvas>
 </div>
@@ -151,12 +148,10 @@ const labelsMeses = [];
 const dadosInvestido = [];
 const dadosJuros = [];
 
-// Ponto de partida (Mês 0)
 labelsMeses.push("Início");
 dadosInvestido.push(pInicial);
 dadosJuros.push(0);
 
-// Cálculo mês a mês para alimentar o gráfico
 for (let i = 1; i <= meses; i++) {
 const valorMontanteInicial = pInicial * Math.pow((1 + taxaMensal), i);
 
@@ -180,7 +175,6 @@ const totalFinalInvestido = dadosInvestido[dadosInvestido.length - 1];
 const totalFinalJuros = dadosJuros[dadosJuros.length - 1];
 const montanteFinal = totalFinalInvestido + totalFinalJuros;
 
-// Mostrar na interface
 document.getElementById('totalInvestido').innerText = totalFinalInvestido.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 document.getElementById('totalJuros').innerText = totalFinalJuros.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 document.getElementById('montanteFinal').innerText = montanteFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
