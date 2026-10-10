@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador de Juros Compostos com Gráfico</title>
+<!-- Importação do Chart.js via CDN estável -->
+<script src="https://jsdelivr.net"></script>
+<style>
+body {
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+background-color: #f4f7f6;
+display: flex;
+justify-content: center;
+align-items: center;
+min-height: 100vh;
+margin: 0;
+padding: 20px;
+box-sizing: border-box;
+}
+.container {
+background-color: #ffffff;
+padding: 30px;
+border-radius: 12px;
+box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+max-width: 800px;
+width: 100%;
+}
+h2 {
+text-align: center;
+color: #333;
+margin-bottom: 24px;
+}
+.content-wrapper {
+display: grid;
+grid-template-columns: 1fr;
+gap: 30px;
+}
+@media (min-width: 768px) {
+.content-wrapper {
+grid-template-columns: 1fr 1fr;
+}
+}
+.form-group {
+margin-bottom: 15px;
+}
+label {
+display: block;
+margin-bottom: 5px;
+color: #666;
+font-weight: 600;
+}
+input {
+width: 100%;
+padding: 10px;
+border: 1px solid #ccc;
+border-radius: 6px;
+box-sizing: border-box;
+font-size: 16px;
+}
+button {
+width: 100%;
+padding: 12px;
+background-color: #2ecc71;
+border: none;
+color: white;
+font-size: 16px;
+font-weight: bold;
+border-radius: 6px;
+cursor: pointer;
+margin-top: 10px;
+transition: background 0.3s;
+}
+button:hover {
+background-color: #27ae60;
+}
+.result {
+margin-top: 25px;
+padding: 15px;
+background-color: #e8f8f5;
+border-radius: 6px;
+display: none;
+}
+.result p {
+margin: 8px 0;
+color: #2c3e50;
+font-size: 16px;
+}
+.result span {
+font-weight: bold;
+color: #27ae60;
+}
+.chart-container {
+position: relative;
+height: 320px;
+width: 100%;
+display: none;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h2>Simulador de Investimentos</h2>
+
+<div class="content-wrapper">
+<!-- Formulário -->
+<div>
+<div class="form-group">
+<label for="inicial">Montante Inicial (R$):&lt;/label&gt; &lt;input type="number" id="inicial" placeholder="Ex: 1000" step="0.01"&gt; &lt;/div&gt; &lt;div class="form-group"&gt; &lt;label for="mensal"&gt;Aporte Mensal (R\$):</label>
+<input type="number" id="mensal" placeholder="Ex: 200" step="0.01">
+</div>
+<div class="form-group">
+<label for="taxa">Taxa de Juros Mensal (%):</label>
+<input type="number" id="taxa" placeholder="Ex: 1" step="0.01">
+</div>
+<div class="form-group">
+<label for="prazo">Prazo (em meses):</label>
+<input type="number" id="prazo" placeholder="Ex: 12">
+</div>
+<button onclick="calcularJurosCompostos()">Calcular</button>
+
+<!-- Resultado -->
+<div class="result" id="resultadoBox">
+<p>Total Investido: <span id="totalInvestido">R$0,00&lt;/span&gt;&lt;/p&gt; &lt;p&gt;Total em Juros: &lt;span id="totalJuros"&gt;R\$ 0,00</span></p>
+<p>Montante Final: <span id="montanteFinal">R$` 0,00</span></p>
+</div>
+</div>
+
+<!-- Gráfico -->
+<div class="chart-container" id="chartBox">
+<canvas id="evolucaoGrafico"></canvas>
+</div>
+</div>
+</div>
+
+<script>
+let meuGrafico = null;
+
+function calcularJurosCompostos() {
+const pInicial = parseFloat(document.getElementById('inicial').value) || 0;
+const pMensal = parseFloat(document.getElementById('mensal').value) || 0;
+const taxaMensal = (parseFloat(document.getElementById('taxa').value) || 0) / 100;
+const meses = parseInt(document.getElementById('prazo').value) || 0;
+
+if (meses <= 0 || taxaMensal < 0) {
+alert("Por favor, insira um prazo e uma taxa válidos.");
+return;
+}
+
+const labelsMeses = [];
+const dadosInvestido = [];
+const dadosJuros = [];
+
+// Ponto de partida (Mês 0)
+labelsMeses.push("Início");
+dadosInvestido.push(pInicial);
+dadosJuros.push(0);
+
+// Cálculo mês a mês para alimentar o gráfico
+for (let i = 1; i <= meses; i++) {
+const valorMontanteInicial = pInicial * Math.pow((1 + taxaMensal), i);
+
+let valorAportesMensais = 0;
+if (taxaMensal === 0) {
+valorAportesMensais = pMensal * i;
+} else {
+valorAportesMensais = pMensal * ((Math.pow((1 + taxaMensal), i) - 1) / taxaMensal);
+}
+
+const totalAcumulado = valorMontanteInicial + valorAportesMensais;
+const totalInvestidoMes = pInicial + (pMensal * i);
+const jurosGanhosMes = Math.max(0, totalAcumulado - totalInvestidoMes);
+
+labelsMeses.push(Mês${i}`);
+dadosInvestido.push(totalInvestidoMes);
+dadosJuros.push(jurosGanhosMes);
+}
+
+const totalFinalInvestido = dadosInvestido[dadosInvestido.length - 1];
+const totalFinalJuros = dadosJuros[dadosJuros.length - 1];
+const montanteFinal = totalFinalInvestido + totalFinalJuros;
+
+// Mostrar na interface
+document.getElementById('totalInvestido').innerText = totalFinalInvestido.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+document.getElementById('totalJuros').innerText = totalFinalJuros.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+document.getElementById('montanteFinal').innerText = montanteFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+document.getElementById('resultadoBox').style.display = 'block';
+document.getElementById('chartBox').style.display = 'block';
+
+renderizarGrafico(labelsMeses, dadosInvestido, dadosJuros);
+}
+
+function renderizarGrafico(labels, investido, juros) {
+const ctx = document.getElementById('evolucaoGrafico').getContext('2d');
+
+if (meuGrafico) {
+meuGrafico.destroy();
+}
+
+meuGrafico = new Chart(ctx, {
+type: 'bar',
+data: {
+labels: labels,
+datasets: [
+{
+label: 'Total Investido',
+data: investido,
+backgroundColor: '#3498db',
+borderColor: '#2980b9',
+borderWidth: 1
+},
+{
+label: 'Juros Acumulados',
+data: juros,
+backgroundColor: '#2ecc71',
+borderColor: '#27ae60',
+borderWidth: 1
+}
+ ]
+},
+options: {
+responsive: true,
+maintainAspectRatio: false,
+scales: {
+x: { stacked: true },
+y: {
+stacked: true,
+ticks: {
+callback: function(value) {
+return 'R$ ' + value.toLocaleString('pt-BR');
+}
+}
+}
+},
+plugins: {
+tooltip: {
+callbacks: {
+label: function(context) {
+let label = context.dataset.label || '';
+if (label) label += ': ';
+if (context.parsed.y !== null) {
+label += new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(context.parsed.y);
+}
+return label;
+}
+}
+}
+}
+}
+});
+}
+</script>
+</body>
+</html>
